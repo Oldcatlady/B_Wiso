@@ -1,202 +1,202 @@
 [
-   {
-"question": "Was ist ein Faktormarkt?",
-"options": {
-"A": "Markt für Konsumgüter",
-"B": "Markt für Produktionsfaktoren wie Arbeit und Kapital",
-"C": "Markt für Luxusgüter",
-"D": "Markt nur für staatliche Güter"
-},
-"correct": "B"
-},
-{
-"question": "Welche Eigenschaft gehört zum vollkommenen Markt?",
-"options": {
-"A": "Persönliche Präferenzen",
-"B": "Inhomogene Güter",
-"C": "Vollkommene Markttransparenz",
-"D": "Preisabsprachen"
-},
-"correct": "C"
-},
-{
-"question": "Was ist ein Polypol?",
-"options": {
-"A": "Ein Anbieter dominiert den Markt",
-"B": "Wenige Anbieter haben Marktmacht",
-"C": "Viele Anbieter konkurrieren miteinander",
-"D": "Nur zwei Anbieter bestimmen den Preis"
-},
-"correct": "C"
-},
-{
-"question": "Was beschreibt ein Monopol?",
-"options": {
-"A": "Viele Anbieter",
-"B": "Ein Anbieter beherrscht den Markt",
-"C": "Zwei Anbieter teilen sich den Markt",
-"D": "Keine Nachfrage vorhanden"
-},
-"correct": "B"
-},
-{
-"question": "Was ist ein typisches Merkmal eines Oligopols?",
-"options": {
-"A": "Viele kleine Anbieter",
-"B": "Ein Anbieter",
-"C": "Wenige Anbieter mit großer Marktmacht",
-"D": "Kein Wettbewerb"
-},
-"correct": "C"
-},
-{
-"question": "Was verbietet das Kartellverbot?",
-"options": {
-"A": "Preissenkungen",
-"B": "Zusammenschlüsse von kleinen Firmen",
-"C": "Absprachen zwischen Unternehmen zur Wettbewerbsverzerrung",
-"D": "Werbung"
-},
-"correct": "C"
-},
-{
-"question": "Welche Funktion hat der Marktpreis NICHT?",
-"options": {
-"A": "Lenkungsfunktion",
-"B": "Informationsfunktion",
-"C": "Ausgleichsfunktion",
-"D": "Produktionsfunktion"
-},
-"correct": "D"
-},
-{
-"question": "Welche Aussage beschreibt die Nachfrage?",
-"options": {
-"A": "Unternehmen produzieren mehr bei hohen Preisen",
-"B": "Verbraucher kaufen mehr bei niedrigeren Preisen",
-"C": "Angebot steigt automatisch",
-"D": "Preise bleiben immer gleich"
-},
-"correct": "B"
-},
-{
-"question": "Was passiert bei einer Verschiebung der Nachfragekurve nach rechts?",
-"options": {
-"A": "Nachfrage sinkt",
-"B": "Nachfrage steigt",
-"C": "Angebot sinkt",
-"D": "Preis wird irrelevant"
-},
-"correct": "B"
-},
-{
-"question": "Was passiert bei einem Angebotsüberhang?",
-"options": {
-"A": "Nachfrage > Angebot",
-"B": "Angebot = Nachfrage",
-"C": "Angebot > Nachfrage",
-"D": "Preis steigt automatisch"
-},
-"correct": "C"
-},
-{
-"question": "Was ist eine Produzentenrente?",
-"options": {
-"A": "Differenz zwischen Marktpreis und Mindestpreis der Anbieter",
-"B": "Staatliche Subvention",
-"C": "Steuer auf Gewinne",
-"D": "Preisuntergrenze"
-},
-"correct": "A"
-},
-{
-"question": "Was ist eine Konsumentenrente?",
-"options": {
-"A": "Differenz zwischen Zahlungsbereitschaft und Marktpreis",
-"B": "Steuer auf Konsum",
-"C": "Gewinn der Unternehmen",
-"D": "Produktionskosten"
-},
-"correct": "A"
-},
-{
-"question": "Was ist ein marktkonformer Eingriff?",
-"options": {
-"A": "Mindestpreis",
-"B": "Höchstpreis",
-"C": "Subventionen",
-"D": "Preisstopp"
-},
-"correct": "C"
-},
-{
-"question": "Was ist ein marktkonträrer Eingriff?",
-"options": {
-"A": "Subvention",
-"B": "Mindest- oder Höchstpreis",
-"C": "Steuer",
-"D": "Werbung"
-},
-"correct": "B"
-},
-{
-"question": "Was passiert bei einem Nachfrageüberhang?",
-"options": {
-"A": "Angebot > Nachfrage",
-"B": "Nachfrage > Angebot",
-"C": "Preis sinkt automatisch",
-"D": "Markt verschwindet"
-},
-"correct": "B"
-},
-{
-"question": "Welche Marktform hat die geringste Marktmacht?",
-"options": {
-"A": "Monopol",
-"B": "Oligopol",
-"C": "Polypol",
-"D": "Kartell"
-},
-"correct": "C"
-},
-{
-"question": "Was ist Preisführung im Oligopol?",
-"options": {
-"A": "Alle Firmen setzen zufällige Preise",
-"B": "Eine Firma bestimmt den Preis, andere folgen",
-"C": "Staat bestimmt Preise",
-"D": "Preise werden verboten"
-},
-"correct": "B"
-},
-{
-"question": "Was ist ein Bestimmungsfaktor der Nachfrage?",
-"options": {
-"A": "Produktionskosten",
-"B": "Einkommen der Konsumenten",
-"C": "Maschinenpreise",
-"D": "Zölle auf Angebot"
-},
-"correct": "B"
-},
-{
-"question": "Was führt typischerweise zu einer Verschiebung der Angebotskurve nach rechts?",
-"options": {
-"A": "Höhere Produktionskosten",
-"B": "Geringere Produktivität",
-"C": "Technischer Fortschritt",
-"D": "Höhere Steuern"
-},
-"correct": "C"
-},
-{
-"question": "Was passiert im Marktgleichgewicht?",
-"options": {
-"A": "Nachfrage = Angebot",
-"B": "Nachfrage > Angebot",
-"C": "Angebot > Nachfrage",
-"D": "Kein Handel"
-},
-"correct": "A"
-} 
+  {
+    "question": "Was ist ein Faktormarkt?",
+    "options": {
+      "A": "Ein Markt, auf dem Konsumgüter gehandelt werden.",
+      "B": "Ein Markt, auf dem Produktionsfaktoren wie Arbeit und Kapital gehandelt werden.",
+      "C": "Ein Markt, der ausschließlich Luxusgüter anbietet.",
+      "D": "Ein Markt, auf dem nur staatliche Güter angeboten werden."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Welche Eigenschaft gehört zu einem vollkommenen Markt?",
+    "options": {
+      "A": "Die Kaufentscheidungen werden durch persönliche Präferenzen beeinflusst.",
+      "B": "Die angebotenen Güter sind inhomogen, also unterschiedlich.",
+      "C": "Es herrscht vollkommene Markttransparenz für alle Marktteilnehmer.",
+      "D": "Anbieter treffen Preisabsprachen untereinander."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Was ist ein Polypol?",
+    "options": {
+      "A": "Ein Anbieter dominiert den gesamten Markt.",
+      "B": "Wenige Anbieter verfügen über große Marktmacht.",
+      "C": "Viele Anbieter und Nachfrager konkurrieren miteinander.",
+      "D": "Nur zwei Anbieter bestimmen gemeinsam den Marktpreis."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Was beschreibt ein Monopol?",
+    "options": {
+      "A": "Viele Anbieter konkurrieren um dieselben Nachfrager.",
+      "B": "Ein einziger Anbieter beherrscht den gesamten Markt.",
+      "C": "Zwei Anbieter teilen sich den Markt gleichmäßig auf.",
+      "D": "Es ist keine Nachfrage auf dem Markt vorhanden."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Was ist ein typisches Merkmal eines Oligopols?",
+    "options": {
+      "A": "Viele kleine Anbieter konkurrieren auf dem Markt.",
+      "B": "Nur ein einziger Anbieter ist auf dem Markt tätig.",
+      "C": "Wenige Anbieter verfügen über eine große Marktmacht.",
+      "D": "Es existiert kein Wettbewerb zwischen den Marktteilnehmern."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Was verbietet das Kartellverbot?",
+    "options": {
+      "A": "Das Senken von Preisen durch einzelne Unternehmen.",
+      "B": "Den Zusammenschluss von kleinen Unternehmen zu größeren.",
+      "C": "Absprachen zwischen Unternehmen, die den Wettbewerb verzerren.",
+      "D": "Das Schalten von Werbung für eigene Produkte."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Welche Funktion erfüllt der Marktpreis NICHT?",
+    "options": {
+      "A": "Er hat eine Lenkungsfunktion, indem er Ressourcen verteilt.",
+      "B": "Er hat eine Informationsfunktion für Anbieter und Nachfrager.",
+      "C": "Er hat eine Ausgleichsfunktion zwischen Angebot und Nachfrage.",
+      "D": "Er hat eine Produktionsfunktion zur Herstellung von Gütern."
+    },
+    "correct": "D"
+  },
+  {
+    "question": "Welche Aussage beschreibt das Verhalten der Nachfrage korrekt?",
+    "options": {
+      "A": "Unternehmen produzieren mehr, wenn die Preise hoch sind.",
+      "B": "Verbraucher kaufen mehr von einem Gut, wenn dessen Preis sinkt.",
+      "C": "Das Angebot steigt automatisch, wenn die Nachfrage steigt.",
+      "D": "Die Preise bleiben auf einem Markt grundsätzlich immer gleich."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Was passiert, wenn sich die Nachfragekurve nach rechts verschiebt?",
+    "options": {
+      "A": "Die Nachfrage nach dem Gut sinkt insgesamt.",
+      "B": "Die Nachfrage nach dem Gut steigt bei jedem Preisniveau.",
+      "C": "Das Angebot auf dem Markt sinkt gleichzeitig.",
+      "D": "Der Preis wird für die Marktteilnehmer irrelevant."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Was trifft bei einem Angebotsüberhang zu?",
+    "options": {
+      "A": "Die Nachfrage übersteigt das Angebot auf dem Markt.",
+      "B": "Angebot und Nachfrage sind auf dem Markt ausgeglichen.",
+      "C": "Das Angebot übersteigt die Nachfrage auf dem Markt.",
+      "D": "Der Preis steigt automatisch, bis ein Gleichgewicht entsteht."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Was ist eine Produzentenrente?",
+    "options": {
+      "A": "Die Differenz zwischen dem erzielten Marktpreis und dem Mindestpreis, zu dem ein Anbieter bereit wäre zu verkaufen.",
+      "B": "Eine staatliche Subvention für Unternehmen in bestimmten Branchen.",
+      "C": "Eine Steuer, die auf die Gewinne von Produzenten erhoben wird.",
+      "D": "Der gesetzlich festgelegte Mindestpreis für ein Produkt."
+    },
+    "correct": "A"
+  },
+  {
+    "question": "Was ist eine Konsumentenrente?",
+    "options": {
+      "A": "Die Differenz zwischen der maximalen Zahlungsbereitschaft eines Käufers und dem tatsächlichen Marktpreis.",
+      "B": "Eine staatliche Steuer, die auf den Konsum bestimmter Güter erhoben wird.",
+      "C": "Der Gewinn, den Unternehmen durch den Verkauf ihrer Produkte erzielen.",
+      "D": "Die gesamten Produktionskosten, die einem Unternehmen entstehen."
+    },
+    "correct": "A"
+  },
+  {
+    "question": "Was ist ein Beispiel für einen marktkonformen Eingriff des Staates?",
+    "options": {
+      "A": "Der Staat legt einen gesetzlichen Mindestpreis für ein Gut fest.",
+      "B": "Der Staat legt einen gesetzlichen Höchstpreis für ein Gut fest.",
+      "C": "Der Staat gewährt Unternehmen Subventionen zur Förderung der Produktion.",
+      "D": "Der Staat verhängt einen vollständigen Preisstopp für alle Güter."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Was ist ein Beispiel für einen marktkonträren Eingriff des Staates?",
+    "options": {
+      "A": "Der Staat gewährt einem Unternehmen eine finanzielle Subvention.",
+      "B": "Der Staat legt einen verbindlichen Mindest- oder Höchstpreis fest.",
+      "C": "Der Staat erhebt eine Steuer auf die Produktion bestimmter Güter.",
+      "D": "Der Staat erlaubt Unternehmen, Werbung für ihre Produkte zu schalten."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Was trifft bei einem Nachfrageüberhang zu?",
+    "options": {
+      "A": "Das Angebot übersteigt die Nachfrage auf dem Markt.",
+      "B": "Die Nachfrage übersteigt das Angebot auf dem Markt.",
+      "C": "Der Preis sinkt automatisch, bis ein Gleichgewicht entsteht.",
+      "D": "Der gesamte Markt bricht zusammen und verschwindet."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Welche Marktform hat für den einzelnen Anbieter die geringste Marktmacht?",
+    "options": {
+      "A": "Das Monopol, bei dem ein Anbieter den Markt allein beherrscht.",
+      "B": "Das Oligopol, bei dem wenige Anbieter große Marktmacht besitzen.",
+      "C": "Das Polypol, bei dem viele Anbieter miteinander konkurrieren.",
+      "D": "Das Kartell, bei dem Unternehmen Preisabsprachen treffen."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Was versteht man unter Preisführerschaft im Oligopol?",
+    "options": {
+      "A": "Alle Unternehmen setzen ihre Preise unabhängig und zufällig fest.",
+      "B": "Ein Unternehmen legt den Marktpreis fest, und die anderen Anbieter folgen diesem.",
+      "C": "Der Staat legt die Preise für alle Unternehmen verbindlich fest.",
+      "D": "Preise werden durch ein gesetzliches Verbot vollständig abgeschafft."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Was ist ein wesentlicher Bestimmungsfaktor der Nachfrage?",
+    "options": {
+      "A": "Die Höhe der Produktionskosten im herstellenden Unternehmen.",
+      "B": "Das verfügbare Einkommen der Konsumenten.",
+      "C": "Die Preise für Maschinen und Produktionsanlagen.",
+      "D": "Die Höhe der Zölle auf importierte Angebotsgüter."
+    },
+    "correct": "B"
+  },
+  {
+    "question": "Was führt typischerweise zu einer Verschiebung der Angebotskurve nach rechts?",
+    "options": {
+      "A": "Ein Anstieg der Produktionskosten für das Unternehmen.",
+      "B": "Eine sinkende Produktivität im Herstellungsprozess.",
+      "C": "Technischer Fortschritt, der die Produktion effizienter macht.",
+      "D": "Eine Erhöhung der Steuern auf die Produktion."
+    },
+    "correct": "C"
+  },
+  {
+    "question": "Was gilt im Marktgleichgewicht?",
+    "options": {
+      "A": "Die nachgefragte Menge entspricht genau der angebotenen Menge.",
+      "B": "Die Nachfrage übersteigt das Angebot dauerhaft.",
+      "C": "Das Angebot übersteigt die Nachfrage dauerhaft.",
+      "D": "Es findet kein Handel zwischen Anbietern und Nachfragern statt."
+    },
+    "correct": "A"
+  }
 ]
