@@ -1,391 +1,757 @@
 /* ========================================
-   QUIZ SCRIPT
+   QUIZ SCRIPT – Haupt-Steuerungsdatei
    ======================================== */
 
-let allQuestions = [];
-let questions = [];
-let current = 0;
-let correct = 0;
-let wrong = 0;
-let answered = false;
+/* ── GLOBALE VARIABLEN ──────────────────────────────────────────
+   Diese Variablen sind überall im Script zugänglich ("global scope").
+   Sie speichern den gesamten Spielzustand. */
 
-let selectedTheme = "candy";
+let allQuestions = [];    // Alle Fragen aus der JSON-Datei (unveränderter Original-Array)
+let questions = [];       // Aktuell aktiver Fragen-Array (kann gemischt sein)
+let current = 0;          // Index der aktuell angezeigten Frage (0 = erste)
+let correct = 0;          // Zähler: wie viele Antworten waren richtig
+let wrong = 0;            // Zähler: wie viele Antworten waren falsch
+let answered = false;     // Flag: hat der User die aktuelle Frage schon beantwortet?
+let selectedTheme = "girl_power"; // Aktuell gewähltes Farbthema
+
+// History-Array: speichert für jede Frage den Zustand nach dem Beantworten.
+// Ermöglicht die "Zurück"-Navigation mit korrekter Anzeige.
+// history[0] = Zustand von Frage 0, history[1] = Zustand von Frage 1, usw.
 let history = [];
 
+
 /* ========================================
-   THEME HANDLING
+   THEME HANDLING (Farbthema-Verwaltung)
    ======================================== */
 
 function previewTheme(theme) {
+    // Speichert das gewählte Theme in der globalen Variable
     selectedTheme = theme;
-    document.body.className = theme;
 
+    // Setzt die Klasse am <body>-Element.
+    // Girl Power ist das Default-Theme in :root → keine extra Klasse nötig.
+    // Alle anderen Themes brauchen eine Klasse (z.B. "man_power"), damit
+    // die CSS-Variablen überschrieben werden.
+    document.body.className = theme === "girl_power" ? "" : theme;
+
+    // Alle Theme-Buttons durchgehen und den aktiven markieren:
+    // toggle(klasse, bedingung) → fügt hinzu wenn true, entfernt wenn false
     document.querySelectorAll(".theme-btn").forEach(btn => {
         btn.classList.toggle("active-theme", btn.dataset.theme === theme);
+        // btn.dataset.theme liest das HTML-Attribut data-theme aus
     });
 
+    // Vorschau-Box einblenden (sie hat CSS display:none, .visible macht display:block)
     const preview = document.getElementById("themePreview");
-    if (preview) preview.classList.add("visible");
+    preview.classList.add("visible");
 }
 
+
 /* ========================================
-   PAGE NAVIGATION
+   SEITEN-NAVIGATION
    ======================================== */
 
+// Blendet alle .page-Elemente aus und zeigt nur die gewünschte Seite
 function showPage(id) {
+    // Zuerst alle Seiten unsichtbar machen
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    // Dann nur die gewünschte Seite einblenden
     document.getElementById(id).classList.add("active");
 }
 
+// Shortcut: zurück zur Startseite
 function goToStart() {
     showPage("startPage");
 }
 
+
 /* ========================================
-   QUIZ START
+   QUIZ STARTEN
    ======================================== */
 
 function startQuiz() {
-    document.body.className = selectedTheme;
+    // Theme auf den <body> anwenden (falls der User auf der Startseite gewählt hat)
+    document.body.className = selectedTheme === "girl_power" ? "" : selectedTheme;
 
+    // Alle Zähler und Zustände auf Ausgangswerte zurücksetzen
     current = 0;
     correct = 0;
     wrong = 0;
     answered = false;
-    history = [];
+    history = [];   // Leerer Array → keine gespeicherten Antworten
 
     showPage("quizPage");
-    loadQuestion();
+    loadQuestion(); // Erste Frage sofort laden
 }
 
+
 /* ========================================
-   LOAD QUESTION
+   FRAGEN LADEN
    ======================================== */
 
 function loadQuestion() {
-
+    // Wenn current über das Ende des Arrays hinaus ist → Ergebnis zeigen
     if (current >= questions.length) {
         showResult();
-        return;
+        return; // Funktion hier beenden
     }
 
-    let q = questions[current];
+    let q = questions[current];           // Aktuelle Frage aus dem Array holen
+    let savedState = history[current];    // Gespeicherter Zustand (falls schon beantwortet)
 
-    answered = false;
+    // Fragetext ins h2-Element schreiben
+    // cleanQuestionText() entfernt evtl. eingebettete Antworten aus dem Text
+    document.getElementById("question").innerText = cleanQuestionText(q.question);
 
-    document.getElementById("question").innerText = q.question;
-    document.getElementById("answers").innerHTML = "";
+    // Feedback-Box zurücksetzen: Klassen entfernen, Inhalt leeren, verstecken
+    document.getElementById("feedback").className = "";
     document.getElementById("feedback").innerHTML = "";
     document.getElementById("feedback").style.display = "none";
 
-    let input = document.getElementById("textAnswer");
-    input.value = "";
-    input.style.display = "none";
+    // Texteingabefeld leeren (für Freitext-Fragen)
+    document.getElementById("textAnswer").value = "";
 
-    renderAnswers(q);
+    // Alte Antwort-Buttons aus dem DOM entfernen (Helper-Funktion weiter unten)
+    clearAnswerButtons();
+    document.getElementById("answers").innerHTML = "";
 
-    updateProgress();
-    updateNavButtons();
-}
-
-/* ========================================
-   RENDER ANSWERS
-   ======================================== */
-
-function renderAnswers(q) {
-
-    const container = document.getElementById("answers");
-
-    if (!q.options) return;
-
-    if (!Array.isArray(q.options)) {
-
-        Object.keys(q.options).forEach(key => {
-            let btn = document.createElement("button");
-            btn.className = "answer-btn";
-            btn.innerText = `${key}: ${q.options[key]}`;
-            btn.onclick = () => checkAnswer(key);
-            container.appendChild(btn);
-        });
-
-        return;
+    // Entscheidung: Frage schon beantwortet (Rückblick) oder neu?
+    if (savedState) {
+        // Frage wurde schon beantwortet → im Read-Only-Rückblick-Modus anzeigen
+        answered = true;
+        renderQuestionWithState(q, savedState);
+    } else {
+        // Neue, noch unbeantwortete Frage → normal anzeigen
+        answered = false;
+        renderQuestion(q);
     }
 
-    q.options.forEach(opt => {
-        let btn = document.createElement("button");
-        btn.className = "answer-btn";
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(opt.charAt(0));
-        container.appendChild(btn);
-    });
+    updateProgress();    // Fortschrittsbalken und Texte aktualisieren
+    updateNavButtons();  // Zurück/Weiter-Buttons aktualisieren
 }
 
+// Rendert eine neue (noch unbeantwortete) Frage
+function renderQuestion(q) {
+    let answersDiv = document.getElementById("answers");
+
+    // ── FALL 1: options ist ein Array ["A) Option1", "B) Option2", ...] ──
+    if (q.options && Array.isArray(q.options)) {
+
+        if (q.type === "mc" || !q.type) {
+            // Multiple-Choice: Buttons für jede Option erstellen
+            q.options.forEach(opt => {
+                let btn = document.createElement("button"); // Neuen Button im Speicher erstellen
+                btn.innerText = opt;
+                btn.className = "answer-btn";
+                // opt.trim().charAt(0) → nimmt den ersten Buchstaben als Antwort-Key (z.B. "A")
+                btn.onclick = () => checkAnswer(opt.trim().charAt(0));
+                answersDiv.appendChild(btn); // Button ins DOM einhängen
+            });
+            document.getElementById("textAnswer").style.display = "none";
+
+        } else if (q.type === "copy") {
+            // Copy-Typ: Buttons füllen das Textfeld aus (zum Abtippen/Lernen)
+            q.options.forEach(opt => {
+                let btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.className = "answer-btn";
+                btn.onclick = () => {
+                    // Klick füllt das Textfeld mit dem Optionstext
+                    document.getElementById("textAnswer").value = opt;
+                    checkAnswer(opt); // Und prüft sofort die Antwort
+                };
+                answersDiv.appendChild(btn);
+            });
+            document.getElementById("textAnswer").style.display = "block";
+        }
+    }
+    // ── FALL 2: options ist ein Objekt {"A": "Text1", "B": "Text2"} ──
+    else if (q.options && typeof q.options === "object") {
+        // Object.keys() gibt ["A", "B", "C", ...] zurück
+        Object.keys(q.options).forEach(key => {
+            let btn = document.createElement("button");
+            btn.innerText = `${key}: ${q.options[key]}`; // z.B. "A: Richtige Antwort"
+            btn.className = "answer-btn";
+            btn.onclick = () => checkAnswer(key); // key = "A", "B", usw.
+            answersDiv.appendChild(btn);
+        });
+        document.getElementById("textAnswer").style.display = "none";
+    }
+
+    // ── FALL 3: Reine Textfrage ohne Buttons ──
+    if (q.type === "text") {
+        document.getElementById("textAnswer").style.display = "block";
+    }
+}
+
+// Rendert eine bereits beantwortete Frage (Read-Only, mit Auflösung)
+function renderQuestionWithState(q, state) {
+    let answersDiv = document.getElementById("answers");
+
+    // Kleines Status-Badge oben in der Karte ("✔ Richtig beantwortet")
+    let tag = document.createElement("div");
+    tag.className = "reviewed-tag";
+    tag.innerText = state.wasCorrect ? "✔ Richtig beantwortet" : "✖ Falsch beantwortet";
+    answersDiv.appendChild(tag);
+
+    // Richtige Antwort und User-Antwort normalisieren (Groß-/Kleinschreibung ignorieren)
+    let correctLetter = (q.correct || q.answer || "").trim().toUpperCase();
+    let userLetter = (state.userAnswer || "").trim().toUpperCase();
+
+    // ── Array-Optionen im Rückblick ──
+    if (q.options && Array.isArray(q.options)) {
+        if (q.type === "mc" || !q.type) {
+            q.options.forEach(opt => {
+                let letter = opt.trim().charAt(0).toUpperCase();
+                let btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.className = "answer-btn";
+                btn.disabled = true; // Nicht mehr anklickbar
+
+                if (letter === correctLetter) {
+                    btn.classList.add("btn-correct");        // Grün = richtige Antwort
+                } else if (letter === userLetter && !state.wasCorrect) {
+                    btn.classList.add("btn-wrong");          // Rot = falsch angeklickte Antwort
+                } else {
+                    btn.style.opacity = "0.45";              // Grau = nicht relevante Option
+                }
+                answersDiv.appendChild(btn);
+            });
+            document.getElementById("textAnswer").style.display = "none";
+
+        } else if (q.type === "copy") {
+            // Texteingabe im Rückblick: befüllt, aber deaktiviert
+            let inputEl = document.getElementById("textAnswer");
+            inputEl.style.display = "block";
+            inputEl.value = state.userAnswer; // Die damalige Antwort anzeigen
+            inputEl.disabled = true;
+
+            q.options.forEach(opt => {
+                let btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.className = "answer-btn";
+                btn.disabled = true;
+                if (opt.toLowerCase() === correctLetter.toLowerCase()) {
+                    btn.classList.add("btn-correct");
+                } else {
+                    btn.style.opacity = "0.45";
+                }
+                answersDiv.appendChild(btn);
+            });
+        }
+    }
+    // ── Objekt-Optionen im Rückblick ──
+    else if (q.options && typeof q.options === "object") {
+        Object.keys(q.options).forEach(key => {
+            let btn = document.createElement("button");
+            btn.innerText = `${key}: ${q.options[key]}`;
+            btn.className = "answer-btn";
+            btn.disabled = true;
+
+            if (key.toUpperCase() === correctLetter) {
+                btn.classList.add("btn-correct");
+            } else if (key.toUpperCase() === userLetter && !state.wasCorrect) {
+                btn.classList.add("btn-wrong");
+            } else {
+                btn.style.opacity = "0.45";
+            }
+            answersDiv.appendChild(btn);
+        });
+        document.getElementById("textAnswer").style.display = "none";
+    }
+
+    // Textfrage im Rückblick
+    if (q.type === "text") {
+        let inputEl = document.getElementById("textAnswer");
+        inputEl.style.display = "block";
+        inputEl.value = state.userAnswer;
+        inputEl.disabled = true;
+    }
+
+    // Feedback-Box mit der gespeicherten Auflösung füllen
+    let feedback = document.getElementById("feedback");
+    let solution = q.correct || q.answer || "";
+    if (state.wasCorrect) {
+        feedback.className = "correct"; // Grüne CSS-Klasse
+        feedback.innerHTML = `<b>Richtig!</b><br>${q.explanation || ""}<br><br><b>Antwort:</b> ${solution}`;
+    } else {
+        feedback.className = "wrong";   // Rote CSS-Klasse
+        feedback.innerHTML = `<b>Falsch!</b><br>Richtige Antwort:<br><b>${solution}</b><br><br>${q.explanation || ""}`;
+    }
+    // Hinweis: display wird hier nicht gesetzt → CSS-Klassen .correct/.wrong machen display:block
+}
+
+
 /* ========================================
-   CHECK ANSWER
+   ANTWORT PRÜFEN
    ======================================== */
 
 function checkAnswer(value) {
-
+    // Guard: wenn schon beantwortet, nichts tun (verhindert Doppel-Klicks)
     if (answered) return;
     answered = true;
 
     let q = questions[current];
-
-    let correctAnswer = (q.correct || "").trim().toUpperCase();
-    let userAnswer = (value || "").trim().toUpperCase();
-
-    let isCorrect = userAnswer === correctAnswer;
-
-    document.querySelectorAll(".answer-btn").forEach(btn => {
-        btn.disabled = true;
-
-        let text = btn.innerText.trim().toUpperCase();
-        let first = text.charAt(0);
-
-        if (first === correctAnswer) btn.classList.add("btn-correct");
-        if (first === userAnswer && !isCorrect) btn.classList.add("btn-wrong");
-    });
-
     let feedback = document.getElementById("feedback");
 
-    if (isCorrect) {
-        correct++;
-        feedback.className = "correct";
-        feedback.innerHTML = "✔ Richtig!";
-    } else {
-        wrong++;
-        feedback.className = "wrong";
-        feedback.innerHTML = `✖ Falsch! Richtige Antwort: ${q.correct}`;
+    // Alle Buttons deaktivieren und leicht transparent machen
+    document.querySelectorAll(".answer-btn").forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+    });
+
+    // Antworten normalisieren: Leerzeichen entfernen, Kleinschreibung
+    let userAnswer   = value?.trim().toLowerCase();
+    // ?. = Optional Chaining: kein Fehler wenn value null/undefined ist
+    let correctAnswer = (q.correct || q.answer || "").trim().toLowerCase();
+    // q.correct || q.answer = unterstützt beide JSON-Feldnamen
+    let wasCorrect = userAnswer === correctAnswer;
+
+    // Für Text/Copy-Fragen: direkter String-Vergleich statt Buchstaben-Vergleich
+    if (q.type === "text" || q.type === "copy") {
+        wasCorrect = value?.trim().toLowerCase() === correctAnswer;
     }
 
-    feedback.style.display = "block";
+    // Buttons visuell einfärben (grün/rot/grau)
+    document.querySelectorAll(".answer-btn").forEach(btn => {
+        let btnText = btn.innerText.trim();
+        // charAt(0) = erster Buchstabe des Button-Texts ("A", "B", usw.)
+        let letter = btnText.charAt(0).toLowerCase();
 
+        if (q.options && !Array.isArray(q.options)) {
+            // Objekt-Format: Key direkt vergleichen
+            if (letter === correctAnswer) {
+                btn.classList.add("btn-correct");
+                btn.style.opacity = "1";
+            } else if (letter === userAnswer && !wasCorrect) {
+                btn.classList.add("btn-wrong");
+                btn.style.opacity = "1";
+            }
+        } else {
+            // Array-Format: Buchstabe ODER vollständiger Text vergleichen
+            // (fallback für Copy-Typ, wo der ganze Text die Antwort ist)
+            if (letter === correctAnswer || btnText.toLowerCase() === correctAnswer) {
+                btn.classList.add("btn-correct");
+                btn.style.opacity = "1";
+            } else if ((letter === userAnswer || btnText.toLowerCase() === userAnswer) && !wasCorrect) {
+                btn.classList.add("btn-wrong");
+                btn.style.opacity = "1";
+            }
+        }
+    });
+
+    // Feedback-Box befüllen und einblenden
+    let solution = q.correct || q.answer || "";
+    if (wasCorrect) {
+        correct++; // Globalen Zähler erhöhen
+        feedback.className = "correct";
+        feedback.innerHTML = `<b>Richtig!</b><br>${q.explanation || ""}<br><br><b>Antwort:</b> ${solution}`;
+    } else {
+        wrong++;   // Globalen Zähler erhöhen
+        feedback.className = "wrong";
+        feedback.innerHTML = `<b>Falsch!</b><br>Richtige Antwort:<br><b>${solution}</b><br><br>${q.explanation || ""}`;
+    }
+
+    feedback.style.display = "block"; // Feedback-Box einblenden
+
+    // Zustand dieser Frage im history-Array speichern
+    // Wird für renderQuestionWithState() beim Zurücknavigieren verwendet
     history[current] = {
-        answer: value,
-        correct: isCorrect
+        answered: true,
+        userAnswer: value,   // Die tatsächlich geklickte/eingegebene Antwort
+        wasCorrect: wasCorrect
     };
 
     updateProgress();
     updateNavButtons();
 }
 
+
 /* ========================================
-   NAVIGATION
+   NAVIGATION (Weiter / Zurück)
    ======================================== */
 
 function nextQuestion() {
+    let q = questions[current];
 
+    // Wenn noch nicht geantwortet: Frage erst beantworten
     if (!answered) {
+        if (q.type === "text" || q.type === "copy") {
+            // Bei Freitext: Wert aus dem Eingabefeld holen
+            let value = document.getElementById("textAnswer").value;
+            if (!value.trim()) {
+                // Leeres Feld → Fehlermeldung, nicht weitergehen
+                let fb = document.getElementById("feedback");
+                fb.className = "wrong";
+                fb.innerHTML = "Bitte gib zuerst eine Antwort ein.";
+                return;
+            }
+            checkAnswer(value); // Freitext-Antwort prüfen
+            return;
+        }
+        // Bei Multiple-Choice: Fehlermeldung wenn kein Button geklickt
         let fb = document.getElementById("feedback");
-        fb.style.display = "block";
         fb.className = "wrong";
-        fb.innerHTML = "Bitte erst beantworten.";
+        fb.innerHTML = "Bitte wähle zuerst eine Antwort aus.";
         return;
     }
 
+    // Normal: eine Frage weiter
     current++;
-
     if (current < questions.length) {
-        loadQuestion();
+        loadQuestion(); // Nächste Frage laden
     } else {
-        showResult();
+        showResult();   // Letzter Frage beantwortet → Ergebnis zeigen
     }
 }
 
 function prevQuestion() {
-    if (current > 0) {
+    if (current > 0) { // Nicht über Anfang hinaus
         current--;
-        loadQuestion();
+        loadQuestion(); // Vorherige Frage laden (history liefert gespeicherten Zustand)
     }
 }
 
 function updateNavButtons() {
-    document.getElementById("prevBtn").style.display =
-        current > 0 ? "block" : "none";
+    let prevBtn = document.getElementById("prevBtn");
+    let nextBtn = document.getElementById("nextBtn");
+
+    // "Zurück"-Button nur anzeigen, wenn eine vorherige Frage existiert UND beantwortet wurde
+    // (Nicht-beantwortete Fragen haben keinen history-Eintrag)
+    prevBtn.style.display = (current > 0 && history[current - 1]) ? "block" : "none";
+
+    // "Weiter"-Button immer anzeigen
+    nextBtn.style.display = "block";
+
+    // Text des Weiter-Buttons anpassen: letzte Frage + beantwortet → "Auswertung"
+    if (current >= questions.length - 1 && answered) {
+        nextBtn.innerText = "Auswertung →";
+    } else {
+        nextBtn.innerText = "Weiter →";
+    }
 }
 
+
 /* ========================================
-   PROGRESS
+   FORTSCHRITT (Balken + Texte)
    ======================================== */
 
 function updateProgress() {
+    // Schutz: nicht ausführen wenn current außerhalb des Arrays
+    if (current >= questions.length) return;
 
-    let total = questions.length;
-    let percent = total ? Math.round((correct / total) * 100) : 0;
+    // Wie viele Fragen wurden bisher beantwortet?
+    // filter(h => h !== null) = zählt alle history-Einträge, die kein null sind
+    let answeredCount = history.filter(h => h !== null).length;
 
     document.getElementById("progressText").innerText =
-        `Frage ${current + 1} / ${total}`;
+        `Frage ${current + 1} / ${questions.length}`;
+        // +1 weil Arrays bei 0 beginnen, aber User "Frage 1" erwartet
 
     document.getElementById("scoreText").innerText =
         `✔ ${correct} | ✖ ${wrong}`;
 
     document.getElementById("percentText").innerText =
-        `(${percent}%)`;
+        answeredCount > 0
+            ? `(${Math.round((correct / answeredCount) * 100)}%)`
+            // Math.round() rundet auf ganze Zahlen (z.B. 66.666... → 67)
+            : ""; // Leer wenn noch keine Frage beantwortet
+
+    // Fortschrittsbalken: (aktuelle Frage / Gesamt) × 100 = Prozent
+    document.getElementById("progressFill").style.width =
+        ((current + 1) / questions.length) * 100 + "%";
 }
 
+
 /* ========================================
-   RESULT
+   ERGEBNIS (IHK-Notenschlüssel)
    ======================================== */
 
 function showResult() {
-
     let total = questions.length;
-    let percent = total ? (correct / total) * 100 : 0;
+    // Prozent berechnen; Division durch 0 abfangen (falls total = 0)
+    let percent = total > 0 ? (correct / total) * 100 : 0;
+    let grade = getGrade(percent); // IHK-Note berechnen
 
-    let grade =
-        percent >= 92 ? 1 :
-        percent >= 81 ? 2 :
-        percent >= 67 ? 3 :
-        percent >= 50 ? 4 :
-        percent >= 30 ? 5 : 6;
+    // Emoji je nach Leistung
+    let gradeLabel = grade <= 2 ? "🎉" : grade <= 4 ? "👍" : "📚";
 
+    // HTML für die Ergebnisseite zusammenbauen (Template Literal mit Backticks)
     document.getElementById("resultContent").innerHTML = `
         <div class="grade-badge">${grade}</div>
-        <p>${percent.toFixed(1)}%</p>
-        <p>✔ ${correct} | ✖ ${wrong}</p>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:16px;">
+            IHK-Note (1 = beste)
+        </p>
+        <p style="font-size:1.1rem; margin-bottom:6px;">
+            ${gradeLabel} ${percent.toFixed(1)}% erreicht
+            <!-- toFixed(1) = eine Nachkommastelle, z.B. "73.3%" -->
+        </p>
+        <p style="color:var(--text-muted); margin-bottom:4px;">
+            ✔ ${correct} richtige &nbsp;|&nbsp; ✖ ${wrong} falsche Antworten
+        </p>
+        <p style="color:var(--text-muted); font-size:0.85rem;">von ${total} Fragen</p>
     `;
 
     showPage("resultPage");
 }
 
+// IHK-Notenschlüssel: gibt Note 1–6 basierend auf Prozentzahl zurück
+function getGrade(p) {
+    if (p >= 92) return 1; // Sehr gut
+    if (p >= 81) return 2; // Gut
+    if (p >= 67) return 3; // Befriedigend
+    if (p >= 50) return 4; // Ausreichend
+    if (p >= 30) return 5; // Mangelhaft
+    return 6;              // Ungenügend (alles unter 30%)
+}
+
+
 /* ========================================
-   SHUFFLE + RESTART
+   SHUFFLE & NEUSTART
    ======================================== */
 
+// Fisher-Yates-Algorithmus: mischt ein Array zufällig durch
+// Geht von hinten nach vorne und tauscht jeden Element mit einem zufälligen
 function shuffleArray(arr) {
-    return arr.sort(() => Math.random() - 0.5);
+    for (let i = arr.length - 1; i > 0; i--) {
+        // Zufälliger Index zwischen 0 und i (inclusive)
+        let j = Math.floor(Math.random() * (i + 1));
+        // Destructuring-Swap: tauscht arr[i] und arr[j] ohne Hilfsvariable
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
 }
 
 function shuffleAndRestart() {
+    // [...allQuestions] = Spread-Operator: erstellt eine flache Kopie des Arrays.
+    // Wichtig: wir wollen allQuestions nicht verändern, nur questions mischen.
     questions = shuffleArray([...allQuestions]);
-    startQuiz();
+    current = 0;
+    correct = 0;
+    wrong = 0;
+    answered = false;
+    history = [];
+    showPage("quizPage");
+    loadQuestion();
 }
 
+
 /* ========================================
-   LOAD QUESTIONS
+   HELPER-FUNKTIONEN
    ======================================== */
 
+// Bereinigt den Fragetext: entfernt Antwort-Zeilen die manchmal im JSON eingebettet sind
+function cleanQuestionText(text) {
+    if (!text) return ""; // Leerstring wenn kein Text vorhanden
+    return text
+        .split("\nA)")[0]         // Alles ab "\nA)" abschneiden
+        .split("\nAntwort:")[0]   // Alles ab "\nAntwort:" abschneiden
+        .split("\nErklärung:")[0] // Alles ab "\nErklärung:" abschneiden
+        .trim();                  // Leerzeichen vorne/hinten entfernen
+        // Die Kette: text → nimm den Teil VOR dem ersten Trennzeichen → trim
+}
+
+// Entfernt alle bestehenden Antwort-Buttons aus dem DOM
+function clearAnswerButtons() {
+    // querySelectorAll gibt alle passenden Elemente zurück
+    // forEach + remove() löscht jedes Element einzeln aus dem DOM
+    document.querySelectorAll(".answer-btn").forEach(btn => btn.remove());
+}
+
+
+/* ========================================
+   ENTER-TASTE für Texteingabe
+   ======================================== */
+
+// Eventlistener: wartet auf Tastendruck im Textfeld
+document.getElementById("textAnswer").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {         // Nur bei Enter reagieren
+        let value = e.target.value;  // e.target = das Textfeld selbst
+        if (value.trim()) checkAnswer(value); // Nur wenn nicht leer
+    }
+});
+
+
+/* ========================================
+   DATEN LADEN (Fragen aus JSON-Datei)
+   ======================================== */
+
+// fetch() lädt eine Datei asynchron (im Hintergrund, blockiert den Browser nicht)
+// .then() = "wenn fertig, dann..." → Promise-Chaining
 fetch("questions.json")
-    .then(res => res.json())
+    .then(res => res.json())  // HTTP-Response in JavaScript-Objekt umwandeln
     .then(data => {
-        allQuestions = data;
-        questions = [...data];
-        showPage("startPage");
+        allQuestions = data;          // Original-Array speichern (für Reset)
+        questions = [...allQuestions]; // Arbeitskopie für das aktive Quiz
+        showPage("startPage");         // Erst wenn Daten geladen: Startseite zeigen
+        // Standard-Theme-Button als aktiv markieren
+        const defaultBtn = document.querySelector('[data-theme="girl_power"]');
+        if (defaultBtn) defaultBtn.classList.add("active-theme");
     })
     .catch(err => {
-        console.error(err);
-        document.body.innerHTML = "Fehler beim Laden der Fragen.";
+        // .catch() = Fehlerbehandlung, wenn fetch() scheitert (z.B. Datei nicht gefunden)
+        console.error("Fehler beim Laden der Fragen:", err);
+        // Gesamten Body mit Fehlermeldung ersetzen
+        document.body.innerHTML =
+            "<p style='color:red;padding:20px;'>Fehler: questions.json konnte nicht geladen werden.</p>";
     });
 
+
 /* ========================================
-   💀 TOTENKOPF (VOLLSTÄNDIG INTEGRIERT)
+   TOTENKOPF-STEUERUNG
    ======================================== */
 
+// DOM-Elemente einmalig referenzieren (effizienter als jedes Mal getElementById)
 const skull = document.getElementById("skull");
-const toggleBtn = document.getElementById("skullToggleBtn");
+const humanEyes = document.querySelectorAll(".human-eye"); // NodeList: beide Augen
+const irises = document.querySelectorAll(".iris");          // NodeList: beide Iris-Kreise
+// || = falls skullToggleBtn nicht existiert, lizardToggleBtn versuchen
+const toggleBtn = document.getElementById("skullToggleBtn") || document.getElementById("lizardToggleBtn");
 
-const humanEyes = document.querySelectorAll(".human-eye");
-const irises = document.querySelectorAll(".iris");
+let skullActive = true;       // Ist der Schädel gerade aktiv?
+let isLaunching = false;      // Fliegt der Schädel gerade? (verhindert Doppel-Klick)
 
-let skullActive = true;
-let isLaunching = false;
-
+// Startposition: Bildschirmmitte
 let sPosX = window.innerWidth / 2;
 let sPosY = window.innerHeight / 2;
+
+// Mausposition (wird per mousemove-Event laufend aktualisiert)
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 
-let sAngle = 0;
-let orbitAngle = 0;
-let eyeTimer = 0;
-let eyesVisible = false;
+let sAngle = 0;            // Aktuelle Neigung des Schädels (in Radiant)
+let eyeTimer = 0;          // Zähler für den Augen-Blink-Rhythmus
+let eyesAreVisible = false; // Sind die menschlichen Augen gerade sichtbar?
+let orbitAngle = 0;        // Winkel der Kreisbahn um den Cursor (in Radiant)
 
+// Mausposition laufend aktualisieren
 window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 });
 
-/* TOGGLE */
+// Toggle-Button: Schädel ein- und ausschalten
 if (toggleBtn) {
     toggleBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // Verhindert, dass der Klick "durchfällt" zum skull-Element
 
-        skullActive = !skullActive;
+        skullActive = !skullActive; // Umschalten (true → false → true ...)
 
         if (!skullActive) {
             toggleBtn.innerText = "💀 Ein";
-            skull.classList.add("skull-hidden");
+            toggleBtn.classList.add("disabled");
+            if (skull) skull.classList.add("skull-hidden"); // Schädel verstecken
         } else {
             toggleBtn.innerText = "💀 Aus";
-            skull.classList.remove("skull-hidden");
-
+            toggleBtn.classList.remove("disabled");
+            if (skull) skull.classList.remove("skull-hidden"); // Schädel zeigen
+            // Schädel direkt zur Mausposition teleportieren (kein langer Weg)
             sPosX = mouseX;
             sPosY = mouseY;
+            sAngle = 0;
         }
     });
 }
 
-/* CLICK LAUNCH */
+// Schädel beim Start sichtbar machen (HTML hat skull-hidden als Standard)
+if (skull) skull.classList.remove("skull-hidden");
+
+// Klick auf den Schädel → Abflug-Animation auslösen
 if (skull) {
     skull.addEventListener("click", () => {
-
-        if (isLaunching || !skullActive) return;
+        if (isLaunching || !skullActive) return; // Schutz gegen Doppel-Klick
 
         isLaunching = true;
 
+        // CSS-Variablen direkt am Element setzen.
+        // Die @keyframes-Animation liest diese Werte für den Startpunkt.
         skull.style.setProperty('--startX', `${sPosX}px`);
         skull.style.setProperty('--startY', `${sPosY}px`);
         skull.style.setProperty('--startAngle', `${sAngle}rad`);
 
-        skull.classList.add("skull-launching");
+        skull.classList.add("skull-launching"); // CSS-Animation startet
 
+        // Nach 5 Sekunden: Animation beenden, Schädel zurücksetzen
         setTimeout(() => {
             skull.classList.remove("skull-launching");
+            sPosX = mouseX; // Schädel erscheint wieder bei der aktuellen Mausposition
+            sPosY = mouseY;
+            sAngle = 0;
             isLaunching = false;
-        }, 1500);
+        }, 5000); // 5000ms = 5 Sekunden
     });
 }
 
-/* ANIMATION LOOP */
-function updateSkull() {
-
-    if (!skullActive || isLaunching || !skull) {
-        requestAnimationFrame(updateSkull);
+// Haupt-Animationsschleife des Schädels (läuft ~60x pro Sekunde)
+function updateSkullBehavior() {
+    // Wenn inaktiv oder fliegend: Frame überspringen, aber Loop fortführen
+    if (!skullActive || isLaunching) {
+        requestAnimationFrame(updateSkullBehavior);
         return;
     }
 
-    orbitAngle += 0.02;
-
-    const radius = 40;
-
-    const targetX = mouseX + Math.cos(orbitAngle) * radius - 30;
-    const targetY = mouseY + Math.sin(orbitAngle) * radius - 35;
-
-    sPosX += (targetX - sPosX) / 20;
-    sPosY += (targetY - sPosY) / 20;
-
-    skull.style.transform =
-        `translate(${sPosX}px, ${sPosY}px) rotate(${sAngle}rad)`;
-
-    eyeTimer++;
-
-    if (eyeTimer > 120) {
-        eyeTimer = 0;
-        eyesVisible = !eyesVisible;
-
-        humanEyes.forEach(e => e.classList.toggle("visible", eyesVisible));
+    if (!skull) {
+        requestAnimationFrame(updateSkullBehavior);
+        return;
     }
 
-    if (eyesVisible) {
-        const ix = Math.cos(orbitAngle * 2) * 3;
-        const iy = Math.sin(orbitAngle * 2) * 3;
+    // ── ORBIT-BEWEGUNG ───────────────────────────────
+    orbitAngle += 0.02; // Winkel pro Frame erhöhen → Schädel kreist um den Cursor
+    const orbitRadius = 40; // Kreisradius in Pixeln
 
-        irises.forEach(i => {
-            i.style.transform = `translate(${ix}px, ${iy}px)`;
+    // Zielposition auf dem Kreis berechnen (trigonometrisch)
+    // Math.cos/sin(angle) gibt Werte zwischen -1 und 1 → × radius = Kreis
+    // -30 / -35: Versatz damit der Schädel-Mittelpunkt auf der Bahn liegt, nicht die Ecke
+    const sTargetX = mouseX + Math.cos(orbitAngle) * orbitRadius - 30;
+    const sTargetY = mouseY + Math.sin(orbitAngle) * orbitRadius - 35;
+
+    // ── SMOOTHING (Verzögertes Folgen) ───────────────
+    const delay = 25; // Je größer, desto träger/schwerer wirkt der Schädel
+    const dx = sTargetX - sPosX; // Differenz zum Ziel (x-Achse)
+    const dy = sTargetY - sPosY; // Differenz zum Ziel (y-Achse)
+
+    // Nur ein Bruchteil der Differenz pro Frame bewegen → weiche Bewegung
+    // Bei delay=25: bewegt 1/25 der restlichen Strecke pro Frame
+    sPosX += dx / delay;
+    sPosY += dy / delay;
+
+    // ── KIPP-ANIMATION ───────────────────────────────
+    // Je mehr seitliche Bewegung (dx), desto mehr Neigung
+    if (Math.abs(dx) > 0.5) { // Nur bei spürbarer Bewegung neigen
+        sAngle += (dx / delay) * 0.05; // Kleine Winkeldrehung proportional zur Geschwindigkeit
+    }
+
+    // Position und Rotation per CSS-Transform setzen
+    skull.style.transform = `translate(${sPosX}px, ${sPosY}px) rotate(${sAngle}rad)`;
+
+    // ── AUGEN-BLINK-RHYTHMUS ─────────────────────────
+    eyeTimer++;
+    if (eyeTimer > 150) { // Alle ~150 Frames (ca. 2.5 Sekunden bei 60fps)
+        eyeTimer = 0;
+        if (Math.random() > 0.4) { // 60% Wahrscheinlichkeit für Zustandswechsel
+            eyesAreVisible = !eyesAreVisible; // Umschalten
+            humanEyes.forEach(eye => {
+                // toggle(klasse, bedingung): hinzufügen wenn eyesAreVisible=true
+                eye.classList.toggle("visible", eyesAreVisible);
+            });
+        }
+    }
+
+    // ── IRIS-BEWEGUNG ────────────────────────────────
+    if (eyesAreVisible) {
+        // Iris bewegt sich auf einer eigenen kleinen Kurve (3× schneller als Orbit)
+        // Gibt den Augen ein lebendiges "Rollen" statt starren Glotzens
+        const irisX = Math.cos(orbitAngle * 3) * 3; // Max. ±3px in x
+        const irisY = Math.sin(orbitAngle * 3) * 3; // Max. ±3px in y
+        irises.forEach(iris => {
+            iris.style.transform = `translate(${irisX}px, ${irisY}px)`;
         });
     }
 
-    requestAnimationFrame(updateSkull);
+    // Nächsten Frame anfordern (Browser ruft diese Funktion beim nächsten Repaint auf)
+    // Effizienter als setInterval: pausiert automatisch in inaktiven Tabs
+    requestAnimationFrame(updateSkullBehavior);
 }
 
-requestAnimationFrame(updateSkull);
+// Loop starten (läuft ab jetzt dauerhaft)
+requestAnimationFrame(updateSkullBehavior);
